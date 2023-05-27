@@ -1,16 +1,13 @@
-from inventory.inventario import Inventario
+# from inventory.inventario import Inventario
+from interfaces.inicio import inicio 
+from interfaces.menu_admin_cliente import menu_admin_cliente
+from core.restaurante import Restaurante
+
 
 def main() -> None:
-    inventario = Inventario()
-    for i in range(10):
-        inventario.add_item('pera', 2)
-    print(inventario.items[0])
-    inventario.quitar_cantidad_item(inventario.get_item('pera'), 2)
-    print(inventario.items[0])
-    print(inventario.export())
-    inventario.quitar_item(inventario.get_item('pera'))
-    print(inventario.items)
-
+    restaurante = Restaurante()
+    inicio()
+    menu_admin_cliente()
 
 
     return

@@ -6,7 +6,7 @@ from person.cliente import Cliente
 from person.mesa import Mesa, Plato
 
 class Restaurante:
-    def __init__(self, nombre, inventario: Inventario = None) -> None:
+    def __init__(self, nombre='') -> None:
         self.__nombre = nombre
         self.__clientes: List['Cliente'] = []
         self.__pedidos: List['Pedido'] = []

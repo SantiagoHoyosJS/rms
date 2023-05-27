@@ -5,7 +5,7 @@ from person.cliente import Cliente
 from person.mesa import Mesa, Plato
 
 class Pedido(ABC):
-    ID = 1
+    ID = 0
 
     def __init__(self, cliente, platos: List['Plato']) -> None:
         self.__id: Pedido.ID
@@ -14,12 +14,13 @@ class Pedido(ABC):
 
         Pedido.ID += 1
 
-    def get_cliente(self) -> 'Cliente':
+    @property
+    def cliente(self) -> 'Cliente':
         return self.__cliente
-    
-    def get_platos(self) -> list['Plato']:
+
+    @property
+    def platos(self) -> list['Plato']:
         return self.__platos
-    
 
 class PedidoPresencial(Pedido):
     def __init__(self, cliente, platos: List['Plato'], mesa: Mesa) -> None:

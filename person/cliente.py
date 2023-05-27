@@ -3,6 +3,11 @@ from typing import List
 class Cliente:
     def __init__(self, nombre) -> None:
         self.__nombre: str = nombre
-    
-    def get_nombre(self) -> str :
+        self.__telefono: str = ''
+        self.__email: str = ''
+
+
+    @property
+    def nombre(self):
         return self.__nombre
+    
