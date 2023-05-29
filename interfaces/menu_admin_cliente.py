@@ -1,6 +1,7 @@
 from tkinter import *
 import csv
-from interfaces.opcion_admin import opcion_admin
+from interfaces.opcion_admin2 import opcion_admin
+from interfaces.Menu import Menu
 
 
 def admin_login():
@@ -13,7 +14,6 @@ def admin_login():
             for row in csv_reader:
                 column1 = row[0]
                 column2 = row[1]
-                # print(column1, type(column2), column1 == user, column2 == password)
                 if column1 == user and column2 == password:
                     print('ENTRE')
                     ventana.destroy()
@@ -81,7 +81,8 @@ def menu_admin_cliente() -> bool: # main
     ventana.resizable(False, False)
 
     def commCliente(): # Ejecutal al presionar Cliente
-        pass
+        ventana.destroy()
+        Menu()
 
     def commAdmin(): # Ejecuta al presionar Admin
         ventana.destroy()

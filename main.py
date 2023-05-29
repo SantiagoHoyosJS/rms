@@ -8,10 +8,7 @@ def main() -> None:
     restaurante = Restaurante()
     inicio()
     menu_admin_cliente()
-
-
-    return
-
+    return    
 
 if __name__ == '__main__':
     main()

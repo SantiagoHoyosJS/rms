@@ -1,4 +1,6 @@
 from tkinter import *
+import tkinter as tk
+import subprocess
 
 def add_mesa():
     
@@ -43,6 +45,16 @@ def add_mesa():
     # Create a "Save" button
     save_button = Button(ventana, text="Guardar cambios", command=save_changes, bg='blue', fg='white')
     save_button.pack(pady=50)
+
+    #Boton Volver
+    def bVolver() -> None:
+        ventanaAdmin = tk.Toplevel(ventana)
+        ventanaAdmin.deiconify()
+        subprocess.Popen(['python', 'interfaces/opcion_admin2.py'])
+        ventana.destroy()
+
+    volver = tk.Button(ventana,command=bVolver,text="Volver",width=6,height=3,font=("Arial", 12, "bold"))
+    volver.place(x=30,y=550)    
 
     # Start the Tkinter event loop
     ventana.mainloop()

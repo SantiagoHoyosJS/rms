@@ -1,8 +1,10 @@
+from __future__ import annotations
 from abc import ABC
 from typing import List
 
-from person.cliente import Cliente
-from person.mesa import Mesa, Plato
+
+# from person.cliente import Cliente
+# from person.mesa import Mesa, Plato
 
 class Pedido(ABC):
     ID = 0
@@ -13,6 +15,10 @@ class Pedido(ABC):
         self.__platos: List['Plato'] = platos
 
         Pedido.ID += 1
+
+    @property
+    def id(self):
+        return self.__id
 
     @property
     def cliente(self) -> 'Cliente':

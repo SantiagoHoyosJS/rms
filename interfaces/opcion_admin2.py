@@ -1,11 +1,20 @@
+from __future__ import annotations
 import tkinter as tk
 from tkinter import filedialog, ttk
+import subprocess
+
+from abc import ABC
+from typing import List
+# from inventory.pedido import Pedido
+# from person.mesa import Plato
 
 # counter = 0
 
 def opcion_admin() -> None:
     wventana = 1200
     hventana = 640
+
+    counter = [0]
 
     ventana = tk.Tk()
     folder = "interfaces/images/"
@@ -35,15 +44,37 @@ def opcion_admin() -> None:
         configuracion()
     
     def pedidosF():
-        global counter; counter = 0
         if botonPedidos.cget("state") == tk.ACTIVE:
-            for t in toggle_buttons:
-                t.grid(row=counter, column=0)
-                counter += 1
+            scroll_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)
+            canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+            for lp in labels_pedidos:
+                lp[0].pack()
+                lp[1].pack()
+                for plato in lp[2]:
+                    plato.pack()
+
+            
+            codigo.place(x=500,y=200)
+            codigo_entry.place(x=500,y=250)
+            pedido_completado.place(x=500,y=300)
+                
         else:
-            for t in toggle_buttons:
-                t.grid_forget()
-    
+            scroll_frame.pack_forget()
+            canvas.pack_forget()
+            scrollbar.pack_forget()
+
+            for lp in labels_pedidos:
+                lp[0].pack_forget()
+                lp[1].pack_forget()
+                for plato in lp[2]:
+                    plato.pack_forget()
+
+            codigo.place_forget()
+            codigo_entry.place_forget()
+            pedido_completado.place_forget()
+
 
     def inventario():
         if botonInventario.cget("state") == tk.ACTIVE:
@@ -69,7 +100,6 @@ def opcion_admin() -> None:
             botonAddPlato.place(x=69,y=73)
             botonDelPlato.place(x=69+246+30,y=73)
             botonModPlato.place(x=69,y=73+139+30)
-            botonAddProm.place(x=69+246+30,y=73+139+30)
             botonAddMesa.place(x=69,y=73+(139+30)*2)
             botonDelMesa.place(x=69+246+30,y=73+(139+30)*2)
         else:
@@ -96,19 +126,23 @@ def opcion_admin() -> None:
 
     file_path = None
 
-    # Vinculos Botones de Barra -> Menu
+    def cambioVentana(directorio:str) -> None:
+        ventanaAdmin = tk.Toplevel(ventana)
+        ventanaAdmin.deiconify()
+        subprocess.Popen(['python', directorio])
+        ventana.destroy()
+
     def mAddPlato() -> None:
-        pass
+        cambioVentana("interfaces/addPlato.py")  
     def mDelPlato() -> None:
-        pass
+        cambioVentana("interfaces/eliminar_plato.py")  
     def mModPlato() -> None:
-        pass
-    def mAddProm() -> None:
-        pass
+        cambioVentana("interfaces/modPlato.py")
     def mAddMesa() -> None:
-        pass
+        cambioVentana("interfaces/a､adir_mesa.py")
     def mDelMesa() -> None:
-        pass
+        cambioVentana("interfaces/eliminar_mesa.py")
+
 
 
     pwidth = round((ventana.winfo_screenwidth() - wventana) / 2)
@@ -137,28 +171,38 @@ def opcion_admin() -> None:
     botonConfig.config(command=lambda:BotonMenuPresionado(botonConfig, 3))
 
     # pedidos
-    # frame1 = tk.Frame(ventana, width=200, height=200, relief=tk.RAISED, borderwidth=2)
-    # frame1.pack(side=tk.LEFT)
-    pedidos = [1,2,3]
-    def toggle(i):
-        print('I es igual a', i)
-        print(len(toggle_buttons))
-        if toggle_vars[i].get():
-            # Mostrar los detalles del pedido
-            clientes[i].grid(row= counter, column=0)
-            counter += 1
-        else:
-            clientes[i].grid_forget()
+    codigo = tk.Label(ventana, text="Codigo:", bg='white', font=("Arial", 14))
+    codigo_entry = tk.Entry(ventana)
+    pedido_completado = tk.Button(ventana, text="Pedido completado", bg='blue', fg='white')
+
+    bg_color_pedidos_frame = 'white'
+    scroll_frame = ttk.Frame(ventana)
+    # Create a canvas
+    canvas = tk.Canvas(scroll_frame)
+    # Create a scrollbar
+    scrollbar = ttk.Scrollbar(scroll_frame, orient=tk.VERTICAL, command=canvas.yview)
+    # Configure the canvas and scrollbar    
+    canvas.configure(yscrollcommand=scrollbar.set, bg=bg_color_pedidos_frame)
+    canvas.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+    # Create a frame inside the canvas   
+    inner_frame = ttk.Frame(canvas)
+    canvas.create_window((0, 0), window=inner_frame, anchor=tk.NW)
+
+    pedidos = [Pedido('Juan', [Plato('Carne'), Plato('Pollo')]), Pedido('Juan', [Plato('Carne'), Plato('Pollo')]), Pedido('Juan', [Plato('Carne'), Plato('Pollo')]), Pedido('Juan', [Plato('Carne'), Plato('Pollo')]), Pedido('Juan', [Plato('Carne'), Plato('Pollo')]), Pedido('Juan', [Plato('Carne'), Plato('Pollo')])]
+    labels_pedidos = []
             
     # TOCA HACER IN LISTA DE PEDIDOS PARA ITERARLA Y MOSTRARLA EN PANTALLA
-    toggle_vars = []
-    toggle_buttons = []
-    clientes = []
-    for z in range(len(pedidos)):
-        toggle_vars.append(tk.BooleanVar(value=False)) # command=lambda index=i: toggle_state(index)
-        toggle_buttons.append(tk.Checkbutton(ventana, text="Toggle", variable=toggle_vars[z], command= lambda index = z: toggle(index)))
-        clientes.append(tk.Label(ventana, text="Cliente", bg='white', font=("Arial", 14)))
-        print(z)
+    for pedido in pedidos:
+        pedido_id = tk.Label(inner_frame, text=f"Pedido {'000'}", bg=bg_color_pedidos_frame, font=("Arial", 14), width=20, anchor="w")
+        pedido_cliente = tk.Label(inner_frame, text=f"Cliente {pedido.cliente}", bg=bg_color_pedidos_frame, font=("Arial", 14), width=20, anchor="center")
+        plato_labels = []
+        for plato in pedido.platos:
+            plato_label = tk.Label(inner_frame, text=plato.nombre, bg=bg_color_pedidos_frame, font=("Arial", 14), width=20, anchor="e")
+            plato_labels.append(plato_label)
+        labels_pedidos.append([pedido_id, pedido_cliente, plato_labels])
+
+
+
 
     # inventario
     table = ttk.Treeview(ventana)
@@ -173,12 +217,11 @@ def opcion_admin() -> None:
     table.heading('1', text='Nombre', anchor=tk.W)
     table.heading('2', text='Cantidad', anchor=tk.W)
 
-    table.insert(parent='', index='end', iid=0, values=('John Doe', 30, 'USA'))
-    table.insert(parent='', index='end', iid=1, values=('Jane Smith', 25, 'UK'))
-    table.insert(parent='', index='end', iid=2, values=('Bob Johnson', 40, 'Canada'))
+    datos_inventario = [('001', 'Jamon', 10), ('002', 'Queso', 15), ('003', 'Harina', 23), ('004', 'Salsa de tomate', ),('005', 'Pollo', 7),('006', 'Carne', 6),('007', 'Mayonesa', 3)]
 
-    for i in range(15):
-        table.insert(parent='', index='end', iid=3+i, values=('Bob Johnson', 40, 'Canada'))
+
+    for i in range(len(datos_inventario)):
+        table.insert(parent='', index='end', iid=3+i, values=datos_inventario[i])
 
     nomrbre_item = tk.Label(ventana, text="Nombre", bg='white', font=("Arial", 14))
     nomrbre_item_entry = tk.Entry(ventana)
@@ -191,10 +234,9 @@ def opcion_admin() -> None:
     botonAddPlato = tk.Button(ventana, image=addPlato, command=mAddPlato, width=246, height=139)
     botonDelPlato = tk.Button(ventana, image=delPlato, command=mDelPlato, width=246, height=139)
     botonModPlato = tk.Button(ventana, image=modPlato, command=mModPlato, width=246, height=139)
-    botonAddProm = tk.Button(ventana, image=addProm, command=mAddProm, width=246, height=139)
     botonAddMesa = tk.Button(ventana, image=addMesa, command=mAddMesa, width=246, height=139)
     botonDelMesa = tk.Button(ventana, image=delMesa, command=mDelMesa, width=246, height=139)
-    botonesMenu = (botonAddPlato,botonDelPlato,botonModPlato,botonAddProm,botonAddMesa,botonDelMesa)
+    botonesMenu = (botonAddPlato,botonDelPlato,botonModPlato,botonAddMesa,botonDelMesa)
 
     # Configuracion
     nombre_res = tk.Label(ventana, text="Nombre del restaurante:", bg='white', font=("Arial", 14))
@@ -215,6 +257,77 @@ def opcion_admin() -> None:
 
     ventana.mainloop()
     return
+
+
+
+
+
+class Pedido(ABC):
+    ID = 0
+
+    def __init__(self, cliente, platos: List['Plato']) -> None:
+        self.__id: Pedido.ID
+        self.__cliente = cliente
+        self.__platos: List['Plato'] = platos
+        Pedido.ID += 1
+
+    @property
+    def id(self):
+        return self.__id
+
+    @property
+    def cliente(self) -> 'Cliente':
+        return self.__cliente
+
+    @property
+    def platos(self) -> list['Plato']:
+        return self.__platos
+
+class PedidoPresencial(Pedido):
+    def __init__(self, cliente, platos: List['Plato'], mesa) -> None:
+        super().__init__(cliente, platos)
+        self.__mesa = mesa
+
+class PedidoDomicilio(Pedido):
+    def __init__(self, cliente, platos: List['Plato'], telefono: str) -> None:
+        super().__init__(cliente, platos)
+        self.__telefono: str = telefono
+
+class Plato:
+    def __init__(self, nombre, descripcion='', precio=0):
+        self.nombre = nombre
+        self.descripcion = descripcion
+        self.precio = precio
+    
+    @property
+    def nombre(self):
+        return self._nombre
+
+    @nombre.setter
+    def nombre(self, value):
+        self._nombre = value
+
+    @property
+    def descripcion(self):
+        return self._descripcion
+
+    @descripcion.setter
+    def descripcion(self, value):
+        self._descripcion = value
+
+    @property
+    def precio(self):
+        return self._precio
+
+    @precio.setter
+    def precio(self, value):
+        self._precio = value
+
+    def __str__(self):
+        return f"{self.nombre}: {self.descripcion} - ${self.precio}"
+    
+    def actualizar_precio(self, nuevo_precio):
+        self.precio = nuevo_precio
 
 
 if __name__ == '__main__':
