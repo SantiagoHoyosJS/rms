@@ -27,24 +27,27 @@ def add_mesa():
     ventana.configure(bg='white')
     ventana.resizable(False, False)
 
+    imagenLamina = tk.PhotoImage(file="interfaces/images/tAddMesa.png")
+    lamina = tk.Label(ventana, image=imagenLamina, width=1235,height=87,borderwidth=0)
+    lamina.place(x=-20,y=0)
 
-    title_label = Label(ventana, text="Añadir mesa", font=("Arial", 18, "bold"), bg='white')
-    title_label.pack(pady=10)
-
+    title_label = Label(ventana, font=("Arial", 18, "bold"), bg='white')
+    title_label.pack(pady=70)
+    
     # Create labels and entry fields for name, email, and password
-    name_label = Label(ventana, text="Número de la mesa:", bg='white', font=("Arial", 14))
+    name_label = Label(ventana, text="Número de la mesa:", bg='white', font=("Arial", 14,"bold"))
     name_label.pack(pady=30)
     name_entry = Entry(ventana)
     name_entry.pack()
 
-    name_label2 = Label(ventana, text="Capacidad de la mesa:", bg='white', font=("Arial", 14))
+    name_label2 = Label(ventana, text="Capacidad de la mesa:", bg='white', font=("Arial", 14,"bold"))
     name_label2.pack(pady=30)
     name_entry2 = Entry(ventana)
     name_entry2.pack()
 
     # Create a "Save" button
-    save_button = Button(ventana, text="Guardar cambios", command=save_changes, bg='blue', fg='white')
-    save_button.pack(pady=50)
+    save_button = Button(ventana, text="Guardar cambios", command=save_changes, bg='blue', fg='white', width=32, height=3)
+    save_button.pack(pady=80)
 
     #Boton Volver
     def bVolver() -> None:

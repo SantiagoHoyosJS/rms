@@ -2,6 +2,7 @@ from __future__ import annotations
 import tkinter as tk
 from tkinter import filedialog, ttk
 import subprocess
+import csv
 
 from abc import ABC
 from typing import List
@@ -188,12 +189,12 @@ def opcion_admin() -> None:
     inner_frame = ttk.Frame(canvas)
     canvas.create_window((0, 0), window=inner_frame, anchor=tk.NW)
 
-    pedidos = [Pedido('Juan', [Plato('Carne'), Plato('Pollo')]), Pedido('Juan', [Plato('Carne'), Plato('Pollo')]), Pedido('Juan', [Plato('Carne'), Plato('Pollo')]), Pedido('Juan', [Plato('Carne'), Plato('Pollo')]), Pedido('Juan', [Plato('Carne'), Plato('Pollo')]), Pedido('Juan', [Plato('Carne'), Plato('Pollo')])]
+    pedidos = [Pedido('Juan', [Plato('Pizza'), Plato('Hamburguesa')]), Pedido('Luis', [Plato('Salchipapa'), Plato('Perro caliente')]), Pedido('Andrea', [Plato('Hamburguesa'), Plato('Pollo asado')]), Pedido('Javier', [Plato('Carne asada'), Plato('Pollo asado')]), Pedido('Laura', [Plato('Pizza'), Plato('Salchipapa')]), Pedido('Carlos', [Plato('Perro caliente'), Plato('Pollo asado')])]
     labels_pedidos = []
             
     # TOCA HACER IN LISTA DE PEDIDOS PARA ITERARLA Y MOSTRARLA EN PANTALLA
     for pedido in pedidos:
-        pedido_id = tk.Label(inner_frame, text=f"Pedido {'000'}", bg=bg_color_pedidos_frame, font=("Arial", 14), width=20, anchor="w")
+        pedido_id = tk.Label(inner_frame, text=f"Pedido {pedido.id}", bg=bg_color_pedidos_frame, font=("Arial", 14), width=20, anchor="w")
         pedido_cliente = tk.Label(inner_frame, text=f"Cliente {pedido.cliente}", bg=bg_color_pedidos_frame, font=("Arial", 14), width=20, anchor="center")
         plato_labels = []
         for plato in pedido.platos:
@@ -205,6 +206,22 @@ def opcion_admin() -> None:
 
 
     # inventario
+    last_id = [0]
+    def guardar_item(nombre, cantidad):
+        last_id[0] += 1
+        item = (last_id[0],nombre,cantidad)
+        with open("interfaces/items.csv", 'a', newline='') as archivo:
+            writer = csv.writer(archivo)
+            writer.writerow(item)
+        datos_inventario.append(item)
+        table.place_forget()
+        table.insert(parent='', index='end', iid=len(datos_inventario), values=datos_inventario[-1])
+        table.place(x=350,y=100)
+        nomrbre_item_entry.delete(0, tk.END)
+        cantidad_item_entry.delete(0, tk.END)
+        return
+    
+    datos_inventario = []
     table = ttk.Treeview(ventana)
     table['columns'] = ('id', 'nombre', 'cantidad')
     table.column('#0', width=0, stretch=tk.NO)  # Hide the first column
@@ -217,17 +234,27 @@ def opcion_admin() -> None:
     table.heading('1', text='Nombre', anchor=tk.W)
     table.heading('2', text='Cantidad', anchor=tk.W)
 
-    datos_inventario = [('001', 'Jamon', 10), ('002', 'Queso', 15), ('003', 'Harina', 23), ('004', 'Salsa de tomate', ),('005', 'Pollo', 7),('006', 'Carne', 6),('007', 'Mayonesa', 3)]
+
+    with open("interfaces/items.csv", 'r', newline='') as archivo:
+        reader = csv.reader(archivo)
+        for row in reader:
+            print(len(row))
+            item = (row[0],row[1],row[2])
+            last_id[0] = int(row[0])
+            datos_inventario.append(item)
+    
+    # datos_inventario = [('001', 'Jamon', 10), ('002', 'Queso', 15), ('003', 'Harina', 23), ('004', 'Salsa de tomate', ),('005', 'Pollo', 7),('006', 'Carne', 6),('007', 'Mayonesa', 3)]
 
 
     for i in range(len(datos_inventario)):
-        table.insert(parent='', index='end', iid=3+i, values=datos_inventario[i])
+        table.insert(parent='', index='end', iid=i, values=datos_inventario[i])
+        
 
     nomrbre_item = tk.Label(ventana, text="Nombre", bg='white', font=("Arial", 14))
     nomrbre_item_entry = tk.Entry(ventana)
     cantidad_item = tk.Label(ventana, text="Cantidad", bg='white', font=("Arial", 14))
     cantidad_item_entry = tk.Entry(ventana)
-    save_item = tk.Button(ventana, text="Añadir ingrediente", bg='blue', fg='white')
+    save_item = tk.Button(ventana, text="Añadir ingrediente", bg='blue', fg='white', command= lambda: guardar_item(nomrbre_item_entry.get(), cantidad_item_entry.get()))
 
     
     #Botones de Barra -> menu
@@ -266,7 +293,7 @@ class Pedido(ABC):
     ID = 0
 
     def __init__(self, cliente, platos: List['Plato']) -> None:
-        self.__id: Pedido.ID
+        self.__id = Pedido.ID
         self.__cliente = cliente
         self.__platos: List['Plato'] = platos
         Pedido.ID += 1
@@ -276,7 +303,7 @@ class Pedido(ABC):
         return self.__id
 
     @property
-    def cliente(self) -> 'Cliente':
+    def cliente(self) -> 'Cliente': 
         return self.__cliente
 
     @property

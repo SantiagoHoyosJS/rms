@@ -15,7 +15,6 @@ def admin_login():
                 column1 = row[0]
                 column2 = row[1]
                 if column1 == user and column2 == password:
-                    print('ENTRE')
                     ventana.destroy()
                     opcion_admin()
                     return True  
